@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+echo "Starting build"
+
+echo "Building FFMPEG"
+build-ffmpeg
+
+echo "Building OBS"
+build-obs
+
+echo "Done!"

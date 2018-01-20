@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -e
+
+#	--enable-nvenc \ 
+
+wget -O ffmpeg-snapshot.tar.bz2 https://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2
+tar xjf ffmpeg-snapshot.tar.bz2
+cd ffmpeg
+./configure \
+	--prefix="/usr/local" \
+	--enable-shared \
+	--extra-libs="-lpthread -lm" \
+	--enable-gpl \
+	--enable-libass \
+	--enable-librtmp \
+	--enable-libfdk-aac \
+	--enable-libfreetype \
+	--enable-libmp3lame \
+	--enable-libopus \
+	--enable-libtheora \
+	--enable-libvorbis \
+	--enable-libwebp \
+	--enable-libvpx \
+	--enable-libx264 \
+	--enable-libx265 \
+	--enable-libxcb --enable-libxcb-shm --enable-libxcb-xfixes \
+	--enable-opencl \
+	--enable-opengl \
+	--enable-openal \
+	--enable-openssl \
+	--enable-version3 \
+	--enable-nonfree
+make -j8
+
+
+# TODO: Make sure the ldconf gets updated
+# The buildin script from checkinstall doesn't work
+
+checkinstall -y -D --pkgname=ffmpeg-git --provides=ffmpeg \
+	--pkgversion="$(date +%Y%m%d-%H%M)-git" \
+	--maintainer "levi v<me@leviv.nu>" \
+	--fstrans=no --backup=no \
+	--requires="libfdk-aac0,libsdl2-2.0-0,libsndio6.1,libmp3lame0,libopus0,libwebp5,libopenal1" \
+	--strip=yes --stripso=yes --gzman=yes
+cp -v *.deb /output/

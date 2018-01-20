@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+if [ ! -d "/build/obs-studio" ]; then
+	git clone --recursive https://github.com/jp9000/obs-studio.git
+	cd /build/obs-studio
+else
+	cd /build/obs-studio
+	git pull
+fi
+if [ -d "/build/obs-studio/build" ]; then
+	rm -R /build/obs-studio/build
+fi
+mkdir /build/obs-studio/build && cd /build/obs-studio/build
+cmake -DUNIX_STRUCTURE=1 -DCMAKE_INSTALL_PREFIX=/usr/local ..
+make -j6
+
+# TODO: Make sure the ldconf gets updated
+# The buildin script from checkinstall doesn't work
+
+checkinstall -y -D --pkgname=obs-studio-git --provides=obs-studio \
+	--pkgversion="$(date +%Y%m%d)-git" \
+	--maintainer "levi v<me@leviv.nu>" \
+	--requires="ffmpeg,libfdk-aac0,libluajit-5.1-2,libxcb-xinerama0" \
+	--fstrans=no --backup=no \
+	--deldoc=yes --strip=yes --stripso=yes --gzman=yes
+cp -v *.deb /output/
